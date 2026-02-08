@@ -6,6 +6,8 @@ from email.mime.text import MIMEText
 import hmac
 import hashlib
 import os
+import threading
+
 
 app = Flask(__name__)
 app.secret_key = 'jevlakay'
@@ -358,12 +360,12 @@ def update_status(id):
         if new_status.lower() == "approved":
             subject = "✅ Appointment Approved - Life Care Clinic"
             body = "Your appointment has been approved."
-            #send_email(email, subject, body)
+            threading.Thread(target=send_email,args=(email, subject, body)).start()
 
         elif new_status.lower() == "cancelled":
             subject = "❌ Appointment Cancelled - Life Care Clinic"
             body = "Your appointment has been cancelled."
-            #send_email(email, subject, body)
+            threading.Thread(target=send_email,args=(email, subject, body)).start()
 
     flash(f"📧 Appointment status updated to {new_status}", "s-updated")
     return redirect(url_for("dashboard"))

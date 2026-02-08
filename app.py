@@ -3,7 +3,6 @@ import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 import smtplib
 from email.mime.text import MIMEText
-import razorpay
 import hmac
 import hashlib
 import os
@@ -13,9 +12,6 @@ app.secret_key = 'jevlakay'
 
 WEBHOOK_SECRET = "jevlakay"  # Same as set in Razorpay dashboard
 
-# Razorpay credentials
-razorpay_client = razorpay.Client(auth=("rzp_test_ssENo9FiYrNaQF", "Ux56gbRZb11oRdKoiASOQW0u"))
-RAZORPAY_APPOINTMENT_AMOUNT = 500
 
 DB_NAME = 'hospital.db'
 
@@ -318,127 +314,6 @@ def admin_logout():
     return redirect(url_for("admin_login"))
 
 
-# def create_payment_link(amount, patient_email):
-#     response = razorpay_client.payment_link.create({
-#         "amount": amount * 100,  # Razorpay accepts amount in paise
-#         "currency": "INR",
-#         "accept_partial": False,
-#         "description": "Orchid Clinic Appointment Fees",
-#         "customer": {
-#             "email": patient_email
-#         },
-#         "notify": {
-#             "email": True
-#         },
-#         # "callback_url": "http://yourdomain.com/payment_status",  # Optional
-#         # "callback_method": "get"
-#     })
-#     return response['short_url']
-
-
-
-#     msg = MIMEText(body)
-#     msg["Subject"] = subject
-#     msg["From"] = sender
-#     msg["To"] = to
-
-#     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-#         server.login(sender, password)
-#         server.sendmail(sender, to, msg.as_string())
-
-
-
-# @app.route("/update_status/<int:id>", methods=["POST"])
-# def update_status(id):
-#     new_status = request.form["status"]
-
-#     conn = sqlite3.connect(DB_NAME)
-#     cursor = conn.cursor()
-
-#     # Update status
-#     cursor.execute("UPDATE appointments SET status=? WHERE id=?", (new_status, id))
-
-#     # Get email for the appointment
-#     cursor.execute("SELECT email FROM appointments WHERE id=?", (id,))
-#     result = cursor.fetchone()
-#     email = result[0] if result else None
-#     conn.commit()
-#     conn.close()
-
-#     # If Approved, send payment link
-#     if new_status == "Approved" and email:
-#         payment_link = create_payment_link(500, email)  # 500 is the appointment fee
-#         subject = "Your Appointment is Approved – Payment Link"
-#         body = f"""Dear Patient,
-
-# Your appointment has been approved.
-
-# Please pay ₹500 using the secure Razorpay link below to confirm your appointment:
-
-# {payment_link}
-
-# Thank you,
-# Orchid Clinic"""
-#         send_email(email, subject, body)
-
-#     # If Cancelled, notify user
-#     elif new_status == "Cancelled" and email:
-#         subject = "Your Appointment is Cancelled"
-#         body = f"""Dear Patient,
-
-# Your appointment has been cancelled.
-
-# Regards,
-# Orchid Clinic"""
-#         send_email(email, subject, body)
-
-#     flash(f"📧 Appointment status updated to {new_status}", "s-updated")
-#     return redirect(url_for("dashboard"))
-
-
-
-
-
-def create_payment_link(amount, patient_email):
-    try:
-        response = razorpay_client.payment_link.create({
-            "amount": amount * 100,  # in paise
-            "currency": "INR",
-            "accept_partial": False,
-            "description": "Life Care Clinic Appointment Fees",
-            "customer": {
-                "email": patient_email
-            },
-            "notify": {
-                "email": False
-            },
-            "reminder_enable": False
-        })
-        print(f"✅ Created Razorpay link: {response['short_url']}")
-        return response['short_url']
-    except Exception as e:
-        print(f"❌ Error creating Razorpay link: {e}")
-        return None
-
-
-def send_email(to, subject, body):
-    sender = "saiyelde123@gmail.com"
-    password = "bwob fimg tycj kpik"
-    
-    try:
-        msg = MIMEText(body)
-        msg["Subject"] = subject
-        msg["From"] = sender
-        msg["To"] = to
-
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-            server.login(sender, password)
-            server.sendmail(sender, to, msg.as_string())
-        print("✅ Email sent successfully.")
-    except Exception as e:
-        print(f"❌ Failed to send email: {e}")
-
-
 @app.route("/update_status/<int:id>", methods=["POST"])
 def update_status(id):
     new_status = request.form["status"]
@@ -457,35 +332,29 @@ def update_status(id):
     email = result[0] if result else None
     conn.close()
 
-    # If approved, send email + Razorpay link
-    if new_status == "Approved" and email:
-        payment_link = create_payment_link(RAZORPAY_APPOINTMENT_AMOUNT, email)
-        if payment_link:
-            subject = "Your Appointment is Approved – Payment Link"
-            body = f"""Dear Patient,
+if new_status == "Approved" and email:
+    subject = "✅ Appointment Approved - Life Care Clinic"
+    body = """Dear Patient,
 
-Your appointment has been approved.
+ Your appointment has been approved.
 
-Please pay ₹{RAZORPAY_APPOINTMENT_AMOUNT} using the secure Razorpay link below to confirm your appointment:
-
-{payment_link}
+ Please visit the clinic on your scheduled date & time.
 
 Thank you,
-Life Care Clinic"""
-            send_email(email, subject, body)
-        else:
-            print("⚠️ Payment link not created. Skipping email.")
+Life Care Clinic
+"""
+     send_email(email, subject, body)
 
-    # If cancelled, notify patient
-    elif new_status == "Cancelled" and email:
-        subject = "Your Appointment is Cancelled"
-        body = f"""Dear Patient,
+elif new_status == "Cancelled" and email:
+     subject = "❌ Appointment Cancelled - Life Care Clinic"
+     body = """Dear Patient,
 
-Your appointment has been cancelled.
+    Your appointment has been cancelled.
 
 Regards,
-Life Care Clinic"""
-        send_email(email, subject, body)
+Life Care Clinic
+"""
+         send_email(email, subject, body)
 
     flash(f"📧 Appointment status updated to {new_status}", "s-updated")
     return redirect(url_for("dashboard"))
@@ -501,11 +370,6 @@ def delete_appointment(id):
     flash("❌ Appointment deleted successfully", "s-deleted")
     return redirect(url_for("dashboard"))
 
-send_email(
-    "saiyelde123@gmail.com",
-    "TEST MAIL",
-    "Agar ye mail aaya to email system sahi hai."
-)
 
 
 if __name__ == "__main__":

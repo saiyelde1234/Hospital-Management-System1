@@ -13,7 +13,7 @@ import os
 app = Flask(__name__)
 app.secret_key = 'jevlakay'
 
-WEBHOOK_SECRET = "jevlakay"  # Same as set in Razorpay dashboard
+WEBHOOK_SECRET = "jevlakay"  
 
 
 DB_NAME = 'hospital.db'

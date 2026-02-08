@@ -116,18 +116,18 @@ def signup():
        email = request.form["email"]
        number = request.form["number"]
        password = generate_password_hash(request.form["password"])
-
-        try:
-            conn = sqlite3.connect(DB_NAME)
-            cursor = conn.cursor()
-            cursor.execute("INSERT INTO users (name, email, number, password) VALUES (?, ?, ?, ?)",(name, email, number, password))
-            conn.commit()
-            conn.close()
-            flash("👤 Account created!", "account")
-            return redirect(url_for("login"))
-        except sqlite3.IntegrityError:
-            flash("Email already registered!")
-            return redirect(url_for("signup"))
+        
+    try:
+        conn = sqlite3.connect(DB_NAME)
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO users (name, email, number, password) VALUES (?, ?, ?, ?)",(name, email, number, password))
+        conn.commit()
+        conn.close()
+        flash("👤 Account created!", "account")
+        return redirect(url_for("login"))
+    except sqlite3.IntegrityError:
+        flash("Email already registered!")
+        return redirect(url_for("signup"))
 
     return render_template("signup.html")
 

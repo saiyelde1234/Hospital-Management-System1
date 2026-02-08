@@ -311,7 +311,7 @@ def admin_logout():
 def send_email(to_email, subject, body):
     try:
         sender_email = "saiyelde123@gmail.com"
-        sender_password = "ucat nbpq fhxp gapq"
+        sender_password = "ucat nbpq fhxp gapq".replace(" ", "")
 
         msg = MIMEText(body)
         msg["Subject"] = subject
@@ -354,9 +354,9 @@ def update_status(id):
     print("STATUS FROM FORM =", new_status)
     print("EMAIL FROM DB =", email)
 
-    if new_status == "Approved" and email:
-        subject = "✅ Appointment Approved - Life Care Clinic"
-        body = """Dear Patient,
+   if new_status.lower() == "approved" and email:
+    subject = "✅ Appointment Approved - Life Care Clinic"
+    body = """Dear Patient,
 
 Your appointment has been approved.
 
@@ -365,16 +365,19 @@ Please visit the clinic on your scheduled date & time.
 Thank you,
 Life Care Clinic
 """
-    elif new_status == "Cancelled" and email:
-        subject = "❌ Appointment Cancelled - Life Care Clinic"
-        body = """Dear Patient,
+    send_email(email, subject, body)
+
+elif new_status.lower() == "cancelled" and email:
+    subject = "❌ Appointment Cancelled - Life Care Clinic"
+    body = """Dear Patient,
 
 Your appointment has been cancelled.
 
 Regards,
 Life Care Clinic
 """
-        send_email(email, subject, body)
+    send_email(email, subject, body)
+
 
     flash(f"📧 Appointment status updated to {new_status}", "s-updated")
     return redirect(url_for("dashboard"))

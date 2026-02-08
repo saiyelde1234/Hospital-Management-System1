@@ -405,7 +405,7 @@ def create_payment_link(amount, patient_email):
             "amount": amount * 100,  # in paise
             "currency": "INR",
             "accept_partial": False,
-            "description": "Orchid Clinic Appointment Fees",
+            "description": "Life Care Clinic Appointment Fees",
             "customer": {
                 "email": patient_email
             },
@@ -422,7 +422,7 @@ def create_payment_link(amount, patient_email):
 
 
 def send_email(to, subject, body):
-    sender = "earliestpath01@gmail.com"
+    sender = "saiyelde123@gmail.com"
     password = "bwob fimg tycj kpik"
     
     try:

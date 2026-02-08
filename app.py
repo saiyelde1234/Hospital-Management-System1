@@ -331,7 +331,7 @@ def send_email(to_email, subject, body):
 
 @app.route("/update_status/<int:id>", methods=["POST"])
 def update_status(id):
-    new_status = request.form["status"]
+    new_status = request.form.get("status")
 
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
@@ -351,23 +351,22 @@ def update_status(id):
     conn.close()
 
     email = row[0] if row else None
-
     print("STATUS FROM FORM =", new_status)
     print("EMAIL FROM DB =", email)
 
-    if new_status.lower() == "approved" and email:
-        subject = "✅ Appointment Approved - Life Care Clinic"
-        body = "Your appointment has been approved."
-        send_email(email, subject, body)
+    if email:
+        if new_status.lower() == "approved":
+            subject = "✅ Appointment Approved - Life Care Clinic"
+            body = "Your appointment has been approved."
+            send_email(email, subject, body)
 
-    elif new_status.lower() == "cancelled" and email:
-        subject = "❌ Appointment Cancelled - Life Care Clinic"
-        body = "Your appointment has been cancelled."
-        send_email(email, subject, body)
+        elif new_status.lower() == "cancelled":
+            subject = "❌ Appointment Cancelled - Life Care Clinic"
+            body = "Your appointment has been cancelled."
+            send_email(email, subject, body)
 
     flash(f"📧 Appointment status updated to {new_status}", "s-updated")
     return redirect(url_for("dashboard"))
-
 
 @app.route("/delete_appointment/<int:id>", methods=["POST"])
 def delete_appointment(id):

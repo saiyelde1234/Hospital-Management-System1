@@ -318,43 +318,48 @@ def admin_logout():
 def update_status(id):
     new_status = request.form["status"]
 
-    # Connect to DB
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
 
-    # Update status
-    cursor.execute("UPDATE appointments SET status=? WHERE id=?", (new_status, id))
-    conn.commit()
+    cursor.execute(
+        "UPDATE appointments SET status=? WHERE id=?",
+        (new_status, id)
+    )
 
-    # Fetch email of patient
-    cursor.execute("SELECT email FROM appointments WHERE id=?", (id,))
-    result = cursor.fetchone()
-    email = result[0] if result else None
+    cursor.execute(
+        "SELECT email FROM appointments WHERE id=?",
+        (id,)
+    )
+    row = cursor.fetchone()
+
+    conn.commit()
     conn.close()
 
-if new_status == "Approved" and email:
-    subject = "✅ Appointment Approved - Life Care Clinic"
-    body = """Dear Patient,
+    email = row[0] if row else None
 
- Your appointment has been approved.
+    if new_status == "Approved" and email:
+        subject = "✅ Appointment Approved - Life Care Clinic"
+        body = """Dear Patient,
 
- Please visit the clinic on your scheduled date & time.
+Your appointment has been approved.
+
+Please visit the clinic on your scheduled date & time.
 
 Thank you,
 Life Care Clinic
 """
-     send_email(email, subject, body)
+        send_email(email, subject, body)
 
-elif new_status == "Cancelled" and email:
-     subject = "❌ Appointment Cancelled - Life Care Clinic"
-     body = """Dear Patient,
+    elif new_status == "Cancelled" and email:
+        subject = "❌ Appointment Cancelled - Life Care Clinic"
+        body = """Dear Patient,
 
-    Your appointment has been cancelled.
+Your appointment has been cancelled.
 
 Regards,
 Life Care Clinic
 """
-         send_email(email, subject, body)
+        send_email(email, subject, body)
 
     flash(f"📧 Appointment status updated to {new_status}", "s-updated")
     return redirect(url_for("dashboard"))

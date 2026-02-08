@@ -313,6 +313,8 @@ def admin_logout():
     flash("🔐 Logged out from Admin.", "info")
     return redirect(url_for("admin_login"))
 
+def send_email(to_email, subject, body):
+    print("📧 Email function called")
 
 @app.route("/update_status/<int:id>", methods=["POST"])
 def update_status(id):
@@ -348,9 +350,6 @@ Please visit the clinic on your scheduled date & time.
 Thank you,
 Life Care Clinic
 """
-      def send_email(to_email, subject, body):
-          print("Email function called")
-
     elif new_status == "Cancelled" and email:
         subject = "❌ Appointment Cancelled - Life Care Clinic"
         body = """Dear Patient,

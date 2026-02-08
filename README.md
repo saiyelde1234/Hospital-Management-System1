@@ -2,7 +2,7 @@
 
 A web-based Hospital Management System built using **Python (Flask)**, **SQLite**, and **Razorpay API** to digitize and streamline hospital operations like appointment booking, doctor management, and automated communication.
 
-🔗 **Live Demo**: [Orchid Clinic](https://orchid-clinic.onrender.com)
+🔗 **Live Demo**: [Life Care Clinic](https://hospital-management-system1-92b2.onrender.com)
 
 ---
 
@@ -44,7 +44,6 @@ To design and develop a user-friendly hospital management system that improves c
 ### Back-End:
 - Python (Flask) – Web framework
 - SQLite – Lightweight, file-based database
-- Razorpay API – Payment link integration
 
 ### Other Tools:
 - Render – Deployment platform
@@ -74,17 +73,15 @@ To design and develop a user-friendly hospital management system that improves c
 
 1. Patients register/login and request an appointment.
 2. Admin reviews the request and approves or cancels it.
-3. Upon approval, the system sends a Razorpay payment link via email.
-4. Once payment is completed, the appointment is confirmed and updated in the system.
-5. Admin can track all interactions from a single dashboard.
+3. Upon approval, the system sends a email.
+4. Admin can track all interactions from a single dashboard.
 
 ---
 
 ## 📧 Email Notification System
 
-- ✔️ **Appointment Approved**: Sends confirmation email with Razorpay payment link.
+- ✔️ **Appointment Approved**: Sends confirmation email .
 - ❌ **Appointment Cancelled**: Sends cancellation notification.
-- 💰 **Payment Confirmation**: Marks appointment as "Paid" after successful transaction.
 
 ---
 
@@ -106,14 +103,14 @@ The system provides a streamlined interface for hospital staff to manage appoint
 
 This project is deployed using **Render** with support for Flask, SQLite, email services, and payment integration.
 
-🔗 **Deployed Link**: [Orchid Clinic](https://orchid-clinic.onrender.com)
+🔗 **Deployed Link**: [Life Care Clinic](https://hospital-management-system1-92b2.onrender.com)
 
 ---
 
 ## 📸 Snapshots 
 
 ### 🏠 Homepage
-![Homepage Screenshot](static/images/screenshots/screencapture-127-0-0-1-4518-2025-05-05-02_14_06.png)
+![Homepage Screenshot]()
 *Figure 1: Homepage with navigation to About, Doctors, and Appointments*
 
 

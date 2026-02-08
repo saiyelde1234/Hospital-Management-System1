@@ -110,7 +110,7 @@ This project is deployed using **Render** with support for Flask, SQLite, email 
 ## 📸 Snapshots 
 
 ### 🏠 Homepage
-![Homepage Screenshot]("screencapture-hospital-management-system1-92b2-onrender-2026-02-08-16_31_32.png")
+![Homepage Screenshot]("static/images/screencapture-hospital-management-system1-92b2-onrender-2026-02-08-16_31_32.png")
 *Figure 1: Homepage with navigation to About, Doctors, and Appointments*
 
 
@@ -164,15 +164,6 @@ This project is deployed using **Render** with support for Flask, SQLite, email 
 ![Email Notification - Cancelled](static/images/screenshots/cancelled.jpg)
 
 *Figure 8: Email sent to patient notifying them of appointment cancellation.*
-
----
-
-### 💳 Razorpay Payment Window
-
-![Razorpay Payment](static/images/screenshots/razorpay.jpg)
-
-*Figure 9: Razorpay window showing fee details and secure payment interface.*
-
 
 ---
 

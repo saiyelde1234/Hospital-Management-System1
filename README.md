@@ -110,7 +110,7 @@ This project is deployed using **Render** with support for Flask, SQLite, email 
 ## 📸 Snapshots 
 
 ### 🏠 Homepage
-![Homepage Screenshot]("screencapture-hospital-management-system1-92b2-onrender-login-2026-02-08-16_50_09.png")
+![Homepage Screenshot]("screencapture-hospital-management-system1-92b2-onrender-2026-02-08-16_31_32.png")
 *Figure 1: Homepage with navigation to About, Doctors, and Appointments*
 
 

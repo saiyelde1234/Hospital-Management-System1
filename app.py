@@ -309,7 +309,25 @@ def admin_logout():
     return redirect(url_for("admin_login"))
 
 def send_email(to_email, subject, body):
-    print("📧 Email function called")
+    try:
+        sender_email = "saiyelde123@gmail.com"
+        sender_password = "ucat nbpq fhxp gapq"
+
+        msg = MIMEText(body)
+        msg["Subject"] = subject
+        msg["From"] = sender_email
+        msg["To"] = to_email
+
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.starttls()
+        server.login(sender_email, sender_password)
+        server.send_message(msg)
+        server.quit()
+
+        print("✅ Email sent to", to_email)
+
+    except Exception as e:
+        print("❌ Email error:", e)
 
 @app.route("/update_status/<int:id>", methods=["POST"])
 def update_status(id):

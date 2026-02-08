@@ -348,7 +348,8 @@ Please visit the clinic on your scheduled date & time.
 Thank you,
 Life Care Clinic
 """
-        send_email(email, subject, body)
+      def send_email(to_email, subject, body):
+          print("Email function called")
 
     elif new_status == "Cancelled" and email:
         subject = "❌ Appointment Cancelled - Life Care Clinic"

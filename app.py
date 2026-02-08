@@ -351,6 +351,8 @@ def update_status(id):
     conn.close()
 
     email = row[0] if row else None
+          print("STATUS FROM FORM =", new_status)
+          print("EMAIL FROM DB =", email)
 
     if new_status == "Approved" and email:
         subject = "✅ Appointment Approved - Life Care Clinic"

@@ -106,32 +106,27 @@ def login():
     return render_template("login.html")
 
 @app.route("/signup", methods=["GET", "POST"])
-@app.route("/signup", methods=["GET", "POST"])
 def signup():
     if request.method == "POST":
         name = request.form["name"]
         email = request.form["email"]
         number = request.form["number"]
         password = generate_password_hash(request.form["password"])
+    
+    try:
+        conn = sqlite3.connect(DB_NAME)
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO users (name, email, number, password) VALUES (?, ?, ?, ?)",(name, email, number, password))
+        conn.commit()
+        conn.close()
 
-        try:
-            conn = sqlite3.connect(DB_NAME)
-            cursor = conn.cursor()
-            cursor.execute(
-                "INSERT INTO users (name, email, number, password) VALUES (?, ?, ?, ?)",
-                (name, email, number, password)
-            )
-            conn.commit()
-            conn.close()
+        flash("👤 Account created!", "account")
+        return redirect(url_for("login"))
 
-            flash("👤 Account created!", "account")
-            return redirect(url_for("login"))
+    except sqlite3.IntegrityError:
+        flash("Email already registered!")
+        return redirect(url_for("signup"))
 
-        except sqlite3.IntegrityError:
-            flash("Email already registered!")
-            return redirect(url_for("signup"))
-
-    # 👇 YE LINE SIRF PAGE OPEN (GET) KE LIYE HAI
     return render_template("signup.html")
 
 

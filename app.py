@@ -351,33 +351,19 @@ def update_status(id):
     conn.close()
 
     email = row[0] if row else None
+
     print("STATUS FROM FORM =", new_status)
     print("EMAIL FROM DB =", email)
 
-   if new_status.lower() == "approved" and email:
-    subject = "✅ Appointment Approved - Life Care Clinic"
-    body = """Dear Patient,
+    if new_status.lower() == "approved" and email:
+        subject = "✅ Appointment Approved - Life Care Clinic"
+        body = "Your appointment has been approved."
+        send_email(email, subject, body)
 
-Your appointment has been approved.
-
-Please visit the clinic on your scheduled date & time.
-
-Thank you,
-Life Care Clinic
-"""
-    send_email(email, subject, body)
-
-elif new_status.lower() == "cancelled" and email:
-    subject = "❌ Appointment Cancelled - Life Care Clinic"
-    body = """Dear Patient,
-
-Your appointment has been cancelled.
-
-Regards,
-Life Care Clinic
-"""
-    send_email(email, subject, body)
-
+    elif new_status.lower() == "cancelled" and email:
+        subject = "❌ Appointment Cancelled - Life Care Clinic"
+        body = "Your appointment has been cancelled."
+        send_email(email, subject, body)
 
     flash(f"📧 Appointment status updated to {new_status}", "s-updated")
     return redirect(url_for("dashboard"))

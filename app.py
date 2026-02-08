@@ -112,14 +112,15 @@ def login():
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
     if request.method == "POST":
-        name = request.form["name"]
-        email = request.form["email"]
-        password = generate_password_hash(request.form["password"])
+       name = request.form["name"]
+       email = request.form["email"]
+       number = request.form["number"]
+       password = generate_password_hash(request.form["password"])
 
         try:
             conn = sqlite3.connect(DB_NAME)
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO users (name, email, password) VALUES (?, ?, ?)", (name, email, password))
+            cursor.execute("INSERT INTO users (name, email, number, password) VALUES (?, ?, ?, ?)",(name, email, number, password))
             conn.commit()
             conn.close()
             flash("👤 Account created!", "account")
@@ -462,7 +463,7 @@ Please pay ₹{RAZORPAY_APPOINTMENT_AMOUNT} using the secure Razorpay link below
 {payment_link}
 
 Thank you,
-Orchid Clinic"""
+Life Care Clinic"""
             send_email(email, subject, body)
         else:
             print("⚠️ Payment link not created. Skipping email.")
@@ -475,7 +476,7 @@ Orchid Clinic"""
 Your appointment has been cancelled.
 
 Regards,
-Orchid Clinic"""
+Life Care Clinic"""
         send_email(email, subject, body)
 
     flash(f"📧 Appointment status updated to {new_status}", "s-updated")

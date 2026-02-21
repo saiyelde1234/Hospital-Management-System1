@@ -262,7 +262,7 @@ def messages():
     conn = get_db_connection()   
     cursor = conn.cursor()
 
-    # Make sure your table includes 'number' column
+    # Make sure your table includes 'number' columns
     cursor.execute("SELECT * FROM messages ORDER BY id DESC")
     messages = cursor.fetchall()
 

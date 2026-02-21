@@ -17,8 +17,9 @@ WEBHOOK_SECRET = "jevlakay"
 
 DB_NAME = 'hospital.db'
 def get_db_connection():
-    conn = sqlite3.connect(DB_NAME, timeout=20, check_same_thread=False)
+    conn = sqlite3.connect(DB_NAME, timeout=60)
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA journal_mode=WAL")  
     return conn
 
 
@@ -35,10 +36,10 @@ def init_db():
             password TEXT NOT NULL
         )''')
         
-        cursor.execute("DROP TABLE IF EXISTS messages")
+       
 
         cursor.execute('''
-            CREATE TABLE messages (
+            CREATE TABLE IF NOT EXISTS messages (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
             email TEXT NOT NULL,
@@ -118,22 +119,34 @@ def signup():
         number = request.form["number"]
         password = generate_password_hash(request.form["password"])
 
+        conn = None   # important for finally
+
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
+
             cursor.execute(
                 "INSERT INTO users (name, email, number, password) VALUES (?, ?, ?, ?)",
                 (name, email, number, password)
             )
-            conn.commit()
-            conn.close()
 
-            flash("👤 Account created!", "account")
-            return redirect(url_for("login"))
+            conn.commit()
 
         except sqlite3.IntegrityError:
             flash("Email already registered!")
             return redirect(url_for("signup"))
+
+        except sqlite3.OperationalError as e:
+            flash("Database busy. Please try again.")
+            print("DB ERROR:", e)
+            return redirect(url_for("signup"))
+
+        finally:
+            if conn:
+                conn.close()   # 🔥 always release DB lock
+
+        flash("👤 Account created!", "account")
+        return redirect(url_for("login"))
 
     return render_template("signup.html")
 
@@ -160,24 +173,35 @@ def appointments():
             "status": "Pending"
         }
 
-        conn = get_db_connection()
-        cursor = conn.cursor()
+        conn = None
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
 
-        cursor.execute('''
-            INSERT INTO appointments 
-            (firstname, lastname, email, number, doctor, date, time, appointment_type, notes, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
-            (data["firstname"], data["lastname"], data["email"], data["number"], data["doctor"],
-             data["date"], data["time"], data["appointment_type"], data["notes"], data["status"])
-        )
+            cursor.execute('''
+                INSERT INTO appointments 
+                (firstname, lastname, email, number, doctor, date, time, appointment_type, notes, status)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                (data["firstname"], data["lastname"], data["email"], data["number"],
+                 data["doctor"], data["date"], data["time"],
+                 data["appointment_type"], data["notes"], data["status"])
+            )
 
-        conn.commit()
-        conn.close()
+            conn.commit()
+
+        except sqlite3.OperationalError as e:
+            flash("Database busy. Please try again.")
+            print("DB ERROR:", e)
+            return redirect(url_for("appointments"))
+
+        finally:
+            if conn:
+                conn.close()
+
         flash("📅 Appointment request sent!", "appointment")
         return redirect(url_for("home"))
 
     return render_template("appointment.html")
-
 
 @app.route("/doctors")
 def doctors():
@@ -193,33 +217,34 @@ def contact():
             "message": request.form.get("message", "")
         }
 
-        conn = get_db_connection()
-        cursor = conn.cursor()
+        conn = None
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
 
-        # Ensure the 'messages' table exists
-        cursor.execute('''CREATE TABLE IF NOT EXISTS messages (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            email TEXT NOT NULL,
-            number TEXT NOT NULL,
-            message TEXT
-        )''')
+            cursor.execute('''
+                INSERT INTO messages 
+                (name, email, number, message)
+                VALUES (?, ?, ?, ?)''',
+                (data["name"], data["email"], data["number"], data["message"])
+            )
 
-        # Insert into the messages table
-        cursor.execute('''
-            INSERT INTO messages 
-            (name, email, number, message)
-            VALUES (?, ?, ?, ?)''',
-            (data["name"], data["email"], data["number"], data["message"])
-        )
+            conn.commit()
 
-        conn.commit()
-        conn.close()
+        except sqlite3.OperationalError as e:
+            flash("Database busy. Please try again.")
+            print("DB ERROR:", e)
+            return redirect(url_for("contact"))
+
+        finally:
+            if conn:
+                conn.close()
+
         flash("📤 Message successfully sent!", "message")
         return redirect(url_for("contact"))
 
     return render_template("contact.html")
-
+    
 @app.route("/dashboard/messages" , methods=["GET", "POST"])
 def messages():
     if not session.get("admin_logged_in"):
@@ -340,51 +365,58 @@ def send_email(to_email, subject, body):
 def update_status(id):
     new_status = request.form.get("status")
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
 
-    cursor.execute(
-        "UPDATE appointments SET status=? WHERE id=?",
-        (new_status, id)
-    )
+        cursor.execute(
+            "UPDATE appointments SET status=? WHERE id=?",
+            (new_status, id)
+        )
 
-    cursor.execute(
-        "SELECT email FROM appointments WHERE id=?",
-        (id,)
-    )
-    row = cursor.fetchone()
+        cursor.execute(
+            "SELECT email FROM appointments WHERE id=?",
+            (id,)
+        )
+        row = cursor.fetchone()
 
-    conn.commit()
-    conn.close()
+        conn.commit()
+
+    finally:
+        if conn:
+            conn.close()
 
     email = row[0] if row else None
-    print("STATUS FROM FORM =", new_status)
-    print("EMAIL FROM DB =", email)
 
     if email:
         if new_status.lower() == "approved":
             subject = "✅ Appointment Approved - Life Care Clinic"
             body = "Your appointment has been approved."
-            threading.Thread(target=send_email,args=(email, subject, body)).start()
+            threading.Thread(target=send_email, args=(email, subject, body)).start()
 
         elif new_status.lower() == "cancelled":
             subject = "❌ Appointment Cancelled - Life Care Clinic"
             body = "Your appointment has been cancelled."
-            threading.Thread(target=send_email,args=(email, subject, body)).start()
+            threading.Thread(target=send_email, args=(email, subject, body)).start()
 
     flash(f"📧 Appointment status updated to {new_status}", "s-updated")
     return redirect(url_for("dashboard"))
 
 @app.route("/delete_appointment/<int:id>", methods=["POST"])
 def delete_appointment(id):
-    conn = get_db_connection() 
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM appointments WHERE id=?", (id,))
-    conn.commit()
-    conn.close()
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM appointments WHERE id=?", (id,))
+        conn.commit()
+    finally:
+        if conn:
+            conn.close()
+
     flash("❌ Appointment deleted successfully", "s-deleted")
     return redirect(url_for("dashboard"))
-
 
 
 if __name__ == "__main__":

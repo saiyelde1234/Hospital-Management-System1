@@ -128,7 +128,7 @@ def signup():
         number = request.form["number"]
         password = generate_password_hash(request.form["password"])
 
-        conn = None   # important for finally
+        conn = None   
 
         try:
             conn = get_db_connection()
@@ -152,7 +152,7 @@ def signup():
 
         finally:
             if conn:
-                conn.close()   # 🔥 always release DB lock
+                conn.close()   
 
         flash("👤 Account created!", "account")
         return redirect(url_for("login"))

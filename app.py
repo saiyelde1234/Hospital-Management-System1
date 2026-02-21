@@ -422,7 +422,7 @@ def update_status(id):
     flash(f"📧 Appointment status updated to {new_status}", "s-updated")
     return redirect(url_for("dashboard"))
 
-@app.route("/delete_appointment/<int:id>", methods=["POST"])
+@app.route("/delete_appointment/<int:id>", methods=["POST"])              #appointment
 def delete_appointment(id):
     conn = None
     try:

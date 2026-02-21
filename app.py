@@ -158,14 +158,14 @@ def signup():
         return redirect(url_for("login"))
 
     return render_template("signup.html")
-
+    
 @app.route("/logout")
 def logout():
     session.pop("user", None)
     flash("🔐 Logged out successfully.", "logout")
     return redirect(url_for("login"))
 
-# Flask Route for Appointments
+# Flask Route  Appointments
 @app.route("/appointments", methods=["GET", "POST"])
 def appointments():
     if request.method == "POST":

@@ -96,11 +96,19 @@ def login():
         email = request.form["email"]
         password = request.form["password"]
 
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT name, password FROM users WHERE email=?", (email,))
-        user = cursor.fetchone()
-        conn.close()
+        conn = None
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT name, password FROM users WHERE email=?",
+                (email,)
+            )
+            user = cursor.fetchone()
+
+        finally:
+            if conn:
+                conn.close()   
 
         if user and check_password_hash(user[1], password):
             session["user"] = user[0]
@@ -109,6 +117,7 @@ def login():
         else:
             flash("❌ Invalid credentials", "error")
             return redirect(url_for("login"))
+
     return render_template("login.html")
 
 @app.route("/signup", methods=["GET", "POST"])
@@ -319,18 +328,28 @@ def admin_signup():
         email = request.form["email"]
         password = generate_password_hash(request.form["password"])
 
+        conn = None
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO admins (fullname, email, password) VALUES (?, ?, ?)",
-                           (fullname, email, password))
+
+            cursor.execute(
+                "INSERT INTO admins (fullname, email, password) VALUES (?, ?, ?)",
+                (fullname, email, password)
+            )
+
             conn.commit()
-            conn.close()
-            flash("✅ Admin account created!", "up-success")
-            return redirect(url_for("admin_login"))
+
         except sqlite3.IntegrityError:
             flash("❌ Admin email already registered!", "up-error")
             return redirect(url_for("admin_signup"))
+
+        finally:
+            if conn:
+                conn.close()   
+
+        flash("✅ Admin account created!", "up-success")
+        return redirect(url_for("admin_login"))
 
     return render_template("admin-signup.html")
 

@@ -17,7 +17,8 @@ WEBHOOK_SECRET = "jevlakay"
 
 
 DB_NAME = 'hospital.db'
-
+def get_db_connection():
+    return sqlite3.connect(DB_NAME, timeout=10, check_same_thread=False)
 
 
 def init_db():
@@ -117,7 +118,7 @@ def signup():
         password = generate_password_hash(request.form["password"])
 
         try:
-            conn = sqlite3.connect(DB_NAME)
+            conn = get_db_connection()
             cursor = conn.cursor()
             cursor.execute(
                 "INSERT INTO users (name, email, number, password) VALUES (?, ?, ?, ?)",

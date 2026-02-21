@@ -226,7 +226,7 @@ def messages():
     if not session.get("admin_logged_in"):
         flash("⛔ Admin access required", "m-error")
         return redirect(url_for("admin_login"))
-    conn = sqlite3.connect(DB_NAME)
+    conn = get_db_connection()   
     cursor = conn.cursor()
 
     # Make sure your table includes 'number' column
@@ -269,7 +269,7 @@ def admin_login():
         
         print(f"Attempting login with: {email} / {password}")
 
-        conn = sqlite3.connect(DB_NAME)
+        conn = get_db_connection()   
         cursor = conn.cursor()
         cursor.execute("SELECT password FROM admins WHERE email=?", (email,))
         admin = cursor.fetchone()

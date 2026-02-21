@@ -18,7 +18,9 @@ WEBHOOK_SECRET = "jevlakay"
 
 DB_NAME = 'hospital.db'
 def get_db_connection():
-    return sqlite3.connect(DB_NAME, timeout=10, check_same_thread=False)
+    conn = sqlite3.connect(DB_NAME, timeout=20, check_same_thread=False)
+    conn.row_factory = sqlite3.Row
+    return conn
 
 
 def init_db():
@@ -94,7 +96,7 @@ def login():
         email = request.form["email"]
         password = request.form["password"]
 
-        conn = sqlite3.connect(DB_NAME)
+        conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT name, password FROM users WHERE email=?", (email,))
         user = cursor.fetchone()
@@ -159,7 +161,7 @@ def appointments():
             "status": "Pending"
         }
 
-        conn = sqlite3.connect(DB_NAME)
+        conn = get_db_connection()
         cursor = conn.cursor()
 
         cursor.execute('''
@@ -192,7 +194,7 @@ def contact():
             "message": request.form.get("message", "")
         }
 
-        conn = sqlite3.connect(DB_NAME)
+        conn = get_db_connection()
         cursor = conn.cursor()
 
         # Ensure the 'messages' table exists
@@ -250,7 +252,7 @@ def dashboard():
         flash("⚠️ Admin login required", "error")
         return redirect(url_for("admin_login"))
 
-    conn = sqlite3.connect(DB_NAME)
+    conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM appointments ORDER BY date DESC, time ASC")
     appointments = cursor.fetchall()
@@ -294,7 +296,7 @@ def admin_signup():
         password = generate_password_hash(request.form["password"])
 
         try:
-            conn = sqlite3.connect(DB_NAME)
+            conn = get_db_connection()
             cursor = conn.cursor()
             cursor.execute("INSERT INTO admins (fullname, email, password) VALUES (?, ?, ?)",
                            (fullname, email, password))
@@ -339,7 +341,7 @@ def send_email(to_email, subject, body):
 def update_status(id):
     new_status = request.form.get("status")
 
-    conn = sqlite3.connect(DB_NAME)
+    conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute(
@@ -376,7 +378,7 @@ def update_status(id):
 
 @app.route("/delete_appointment/<int:id>", methods=["POST"])
 def delete_appointment(id):
-    conn = sqlite3.connect(DB_NAME) 
+    conn = get_db_connection() 
     cursor = conn.cursor()
     cursor.execute("DELETE FROM appointments WHERE id=?", (id,))
     conn.commit()

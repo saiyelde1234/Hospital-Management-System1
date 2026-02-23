@@ -117,7 +117,7 @@ This project is deployed using **Render** with support for Flask, SQLite, email 
 
 ### 📄 About Us Page
 
-![About Us]("screencapture-hospital-management-system1-92b2-onrender-aboutus-2026-02-08-16_32_09.png")
+![About Us]("C:\Users\Lenovo\Downloads\About.png")
 
 *Figure 2: About Us page showing hospital mission, values, and achievements.*
 

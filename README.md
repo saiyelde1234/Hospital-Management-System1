@@ -1,4 +1,4 @@
-# 🏥 Hospital Management System (HMS)
+<img width="1920" height="3525" alt="Home" src="https://github.com/user-attachments/assets/e3c4bd65-d28f-42ed-a5b4-a3c188fcd611" /># 🏥 Hospital Management System (HMS)
 
 A web-based Hospital Management System built using **Python (Flask)**, **SQLite**, and **Razorpay API** to digitize and streamline hospital operations like appointment booking, doctor management, and automated communication.
 
@@ -110,7 +110,7 @@ This project is deployed using **Render** with support for Flask, SQLite, email 
 ## 📸 Snapshots 
 
 ### 🏠 Homepage
-![Homepage Screenshot]("(https://github.com/saiyelde1234/Hospital-Management-System1/blob/main/static/images/Home.png)")
+![Homepage Screenshot]("\Downloads\Home.png")
 *Figure 1: Homepage with navigation to About, Doctors, and Appointments*
 
 

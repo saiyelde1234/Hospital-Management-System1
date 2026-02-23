@@ -320,7 +320,7 @@ def admin_login():
 
     return render_template("admin-login.html")
 
-# Admin Signup Route
+# Admin Signup Route                                   admin signup page
 @app.route("/admin-signup", methods=["GET", "POST"])
 def admin_signup():
     if request.method == "POST":

@@ -117,7 +117,7 @@ This project is deployed using **Render** with support for Flask, SQLite, email 
 
 ### 📄 About Us Page
 
-![About Us]("C:\Users\Lenovo\Downloads\About.png")
+![About Us]("\Downloads\About.png")
 
 *Figure 2: About Us page showing hospital mission, values, and achievements.*
 
